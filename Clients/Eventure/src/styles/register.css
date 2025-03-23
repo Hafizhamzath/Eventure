@@ -1,0 +1,275 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  } */
+  
+ 
+  /* Registration Container */
+.registration-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+    background-image: url('/assets/images/alexander-grey-YTGt96tGxSY-unsplash.jpg'); /* Background image */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 1rem;
+  }
+  
+  .registration-card {
+    background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    max-width: 28rem;
+    width: 100%;
+    backdrop-filter: blur(10px); /* Frosted glass effect */
+  }
+  
+  .registration-card {
+    background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    max-width: 28rem;
+    width: 100%;
+    backdrop-filter: blur(10px); /* Adds a blur effect to the background */
+  }
+  
+  /* Header */
+  .header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+  }
+  
+  .header p {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+  
+  /* Step Content */
+  .step-content p {
+    font-size: 1.125rem;
+    color: #374151;
+    margin-bottom: 1rem;
+  }
+  
+  /* Input Container */
+  .input-container {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  
+  .input-container input {
+    width: 100%;
+    padding: 0.5rem 2.5rem 0.5rem 2.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+  }
+  
+  .input-container input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+  }
+  
+  .input-container input.error {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+  }
+  
+  .input-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+  }
+  
+  /* Password Strength */
+  .password-strength {
+    margin-top: 0.5rem;
+  }
+  
+  .strength-bars {
+    display: flex;
+    gap: 0.25rem;
+    margin-top: 0.25rem;
+  }
+  
+  .strength-bars div {
+    height: 0.25rem;
+    flex: 1;
+    border-radius: 0.125rem;
+    background-color: #e2e8f0;
+  }
+  
+  .strength-bars div.strong {
+    background-color: #10b981;
+  }
+  
+  .password-strength p {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+  }
+  
+  /* Role Selection */
+  .role-selection {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+  
+  .role-button {
+    padding: 1.5rem;
+    border: 2px solid rgba(209, 213, 219, 0.5); /* Semi-transparent border */
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .role-button:hover {
+    border-color: rgba(191, 219, 254, 0.7); /* Semi-transparent hover border */
+    background-color: rgba(249, 250, 251, 0.9); /* Semi-transparent hover background */
+  }
+  
+  .role-button.selected {
+    border-color: rgba(59, 130, 246, 0.8); /* Semi-transparent selected border */
+    background-color: rgba(239, 246, 255, 0.9); /* Semi-transparent selected background */
+  }
+  
+  .role-button span {
+    font-size: 2rem;
+  }
+  
+  .role-button h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-top: 0.75rem;
+  }
+  
+  .role-button p {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+  }
+  
+  /* Error Message */
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ef4444;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  /* Button */
+  .button {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background-color: rgba(59, 130, 246, 0.9); /* Semi-transparent blue background */
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .button:hover {
+    background-color: rgba(37, 99, 235, 0.9); /* Semi-transparent darker blue on hover */
+  }
+  
+  .button:active {
+    background-color: rgba(29, 78, 216, 0.9); /* Semi-transparent even darker blue on click */
+  }
+
+  /* Footer */
+/* Footer */
+.footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    background-image: url('https://res.cloudinary.com/dc54r1zx9/image/upload/v1740076446/pmqj5o7rrpthhlcgcdft.png'); /* Path to your logo */
+    background-size: cover;  /* Ensures the image covers the entire section */
+    background-repeat: no-repeat;
+    background-position: center; /* Centers the background image */
+    opacity: 0.8; /* Make the logo slightly transparent */
+    padding: 2rem 0; /* Add padding for better visibility */
+    min-height: 150px; /* Increases the height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+  
+  .footer-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  /* Add the logo as a background image */
+  .footer-content::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 1rem; /* Adjust the position of the logo */
+    transform: translateY(-50%);
+    width: 24px; /* Adjust the size of the logo */
+    height: 24px;
+    
+  }
+  
+  .footer p {
+    font-size: 0.875rem;
+    color: #ffffff;
+    margin: 0;
+  }
+  
+  .footer a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  
+  .footer a:hover {
+    text-decoration: underline;
+  }

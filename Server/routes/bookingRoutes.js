@@ -1,13 +1,13 @@
 const express = require("express");
 const Booking = require("../models/Booking");
 const Event = require("../models/Event");
-const authMiddleware = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware"); 
 const nodemailer = require("nodemailer");
 const QRCode = require("qrcode");
 
 const router = express.Router();
 
-// 📌 Configure Email Transporter
+// Email Transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -16,45 +16,66 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// 📌 Book an Event
-router.post("/", authMiddleware, async (req, res) => {
+// Book an Event
+router.post("/", protect, async (req, res) => {
   try {
-    const { eventId } = req.body;
+    const { event, user, tickets, totalAmount } = req.body;
+
+    // Debugging: Log the request body
+    console.log("Request Body:", req.body);
 
     // Check if event exists
-    const event = await Event.findById(eventId);
-    if (!event) {
+    const eventDetails = await Event.findById(event);
+    if (!eventDetails) {
       return res.status(404).json({ message: "Event not found" });
     }
 
-    // Ensure user email is present
-    if (!req.user || !req.user.email) {
-      return res.status(400).json({ message: "User email not found!" });
+    // Debugging: Log the event details
+    console.log("Event Details:", eventDetails);
+
+    // Ensure authenticated user exists
+    if (!req.user || !req.user.id) {
+      return res.status(400).json({ message: "User not authenticated!" });
     }
+
+    // Debugging: Log the authenticated user
+    console.log("Authenticated User:", req.user);
 
     // Create a new booking
     const newBooking = new Booking({
-      user: req.user.id,
-      event: eventId,
+      user: req.user.id, // Use authenticated user's ID
+      event: event, // Use event ID from request body
+      tickets: tickets, // Use ticket count from request body
+      totalAmount: totalAmount, // Use total amount from request body
       paymentStatus: "pending", // Default status
     });
 
-    await newBooking.save();
+    // Debugging: Log the new booking object
+    console.log("New Booking:", newBooking);
 
-    // 📌 Generate QR Code as a Buffer
-    const qrData = `Event: ${event.title}, User: ${req.user.name}, Booking ID: ${newBooking._id}`;
+    // Save the booking
+    await newBooking.save().catch((err) => {
+      console.error("Error saving booking:", err);
+      throw err; // Re-throw the error to be caught by the outer try-catch
+    });
+
+    // Debugging: Log success message
+    console.log("Booking saved successfully:", newBooking);
+
+    // Generate QR Code as a Buffer
+    const qrData = `Event: ${eventDetails.title}, User: ${req.user.name}, Booking ID: ${newBooking._id}`;
     const qrCodeImage = await QRCode.toDataURL(qrData); // Base64 QR Code
 
-    // 📌 Send Confirmation Email with QR Code as an Attachment
+    // Send Confirmation Email with QR Code as an Attachment
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: req.user.email, // Ensure email is correctly set
-      subject: `🎟 Booking Confirmation - ${event.title}`,
+      to: req.user.email, // Use authenticated user's email
+      subject: `🎟 Booking Confirmation - ${eventDetails.title}`,
       html: `
         <h3>Hello ${req.user.name},</h3>
-        <p>You have successfully booked the event: <strong>${event.title}</strong></p>
-        <p><strong>Date:</strong> ${new Date(event.date).toDateString()}</p>
-        <p><strong>Venue:</strong> ${event.venue}</p>
+        <p>You have successfully booked the event: <strong>${eventDetails.title}</strong></p>
+        <p><strong>Date:</strong> ${new Date(eventDetails.date).toDateString()}</p>
+        <p><strong>Venue:</strong> ${eventDetails.venue}</p>
         <p><strong>Payment Status:</strong> ${newBooking.paymentStatus}</p>
         <h4>Your QR Code (Show this at entry):</h4>
         <img src="cid:qrcode" alt="QR Code" width="200"/>
@@ -71,6 +92,7 @@ router.post("/", authMiddleware, async (req, res) => {
       ],
     };
 
+    // Send email
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
         console.log("❌ Error sending email:", err);
@@ -80,6 +102,7 @@ router.post("/", authMiddleware, async (req, res) => {
       }
     });
 
+    // Return success response
     res.status(201).json({
       message: "Booking confirmed & email sent!",
       booking: newBooking,
@@ -92,11 +115,11 @@ router.post("/", authMiddleware, async (req, res) => {
   }
 });
 
-//get events
-router.get("/", authMiddleware, async (req, res) => {
+// Get all bookings for the authenticated user
+router.get("/", protect, async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user.id }).populate("event", "title date venue");
-    
+
     if (!bookings || bookings.length === 0) {
       return res.status(404).json({ message: "No bookings found for this user." });
     }
@@ -107,6 +130,5 @@ router.get("/", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server Error", error });
   }
 });
-
 
 module.exports = router;

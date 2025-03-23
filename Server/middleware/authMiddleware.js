@@ -1,24 +1,47 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-const authMiddleware = async (req, res, next) => {
-  const token = req.header("Authorization");
+// Middleware to protect routes (authentication)
+const protect = async (req, res, next) => {
+  let token;
 
-  if (!token) return res.status(401).json({ message: "Access Denied. No token provided." });
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    try {
+      token = req.headers.authorization.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select("-password");
 
-  try {
-    const verified = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
+      console.log("Authenticated User ID:", req.user?._id); // Log the user ID
+      if (!req.user) {
+        return res.status(401).json({ message: "User not found" });
+      }
 
-    // Fetch full user details from database
-    const user = await User.findById(verified.id).select("-password");
-
-    if (!user) return res.status(401).json({ message: "User not found" });
-
-    req.user = user; // Attach full user object to request
-    next();
-  } catch (error) {
-    res.status(400).json({ message: "Invalid Token" });
+      next();
+    } catch (error) {
+      console.log("Token verification failed:", error);
+      res.status(401).json({ message: "Invalid token, access denied" });
+    }
+  } else {
+    res.status(401).json({ message: "No token, authorization denied" });
   }
 };
 
-module.exports = authMiddleware;
+
+
+// Middleware to check if the user is an admin
+const isAdmin = (req, res, next) => {
+  console.log("🛑 Checking admin role:", req.user?.role); // Debug log
+
+  if (!req.user) {
+    return res.status(401).json({ message: "Not authorized, user not found" });
+  }
+
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Access denied, admin privileges required" });
+  }
+
+  next();
+};
+
+
+module.exports = { protect, isAdmin };

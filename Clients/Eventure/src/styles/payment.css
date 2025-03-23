@@ -1,0 +1,175 @@
+/* Main container with premium gradient */
+.payment-gradient-background {
+  background: linear-gradient(125deg, #0f172a 0%, #1e293b 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.payment-gradient-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(56, 189, 248, 0.1) 0%, rgba(56, 189, 248, 0) 30%), 
+    radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0) 30%);
+  pointer-events: none;
+}
+
+/* Flex container for card and form */
+.payment-container {
+  display: flex;
+  gap: 48px;
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  align-items: center;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .payment-container {
+    flex-direction: row;
+  }
+}
+
+/* Form container with glass effect */
+.payment-form-container {
+  flex: 1;
+  max-width: 600px;
+  animation: slideUp 0.6s ease-out;
+}
+
+.payment-glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 
+    0 20px 50px -10px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset,
+    0 1px 0 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+/* Form elements */
+.payment-form-title {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(to right, #fff, #c7d2fe);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 32px;
+  letter-spacing: -0.5px;
+}
+
+.payment-form-group {
+  margin-bottom: 24px;
+}
+
+.payment-form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.payment-premium-input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.payment-premium-input:focus {
+  outline: none;
+  border-color: rgba(99, 102, 241, 0.6);
+  box-shadow: 
+    0 0 0 3px rgba(99, 102, 241, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.payment-premium-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Secure badge */
+.payment-secure-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.payment-secure-badge svg {
+  color: #38bdf8;
+}
+
+/* Premium button */
+.payment-premium-button {
+  position: relative;
+  width: 100%;
+  padding: 16px 24px;
+  border-radius: 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  margin-top: 16px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: 
+    0 8px 20px rgba(79, 70, 229, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  transform: translateZ(0);
+}
+
+.payment-premium-button:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 
+    0 15px 30px rgba(79, 70, 229, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.15) inset;
+}
+
+.payment-premium-button:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

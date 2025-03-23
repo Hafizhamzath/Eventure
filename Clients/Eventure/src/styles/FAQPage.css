@@ -1,0 +1,150 @@
+/* FAQPage.css */
+.faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 4rem;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+  }
+  
+  .faq-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .faq-header h1 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+  
+  .faq-header p {
+    color: #7f8c8d;
+  }
+  
+  .faq-search {
+    display: flex;
+    margin-bottom: 2rem;
+  }
+  
+  .faq-search input {
+    flex-grow: 1;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+    font-size: 16px;
+  }
+  
+  .search-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  
+  .search-button:hover {
+    background-color: #2980b9;
+  }
+  
+  .faq-list {
+    margin-bottom: 2rem;
+  }
+  
+  .faq-item {
+    margin-bottom: 1rem;
+    border: 1px solid #e6e6e6;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .faq-question:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .faq-question.active {
+    background-color: #e3f2fd;
+  }
+  
+  .faq-question h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+  
+  .faq-icon {
+    font-size: 1.5rem;
+    color: #3498db;
+  }
+  
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+  
+  .faq-answer.active {
+    max-height: 500px;
+    transition: max-height 0.6s ease-in;
+  }
+  
+  .faq-answer p {
+    padding: 1rem;
+    margin: 0;
+    line-height: 1.6;
+    border-top: 1px solid #e6e6e6;
+  }
+  
+  .faq-footer {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .contact-button {
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    margin-top: 0.5rem;
+  }
+  
+  .contact-button:hover {
+    background-color: #1a252f;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .faq-container {
+      padding: 1rem;
+    }
+    
+    .faq-search {
+      flex-direction: column;
+    }
+    
+    .faq-search input {
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .search-button {
+      border-radius: 4px;
+      padding: 10px;
+    }
+  }

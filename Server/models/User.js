@@ -19,6 +19,7 @@ const UserSchema = new mongoose.Schema({
     enum: ["admin", "organizer", "attendee"],
     default: "attendee" 
   },
+  phoneNumber: { type: String, default: "" },
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", UserSchema);

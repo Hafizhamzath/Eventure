@@ -6,20 +6,32 @@ const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const webhookRoutes = require("./routes/webhookRoutes")
+const adminRoutes = require("./routes/adminRoutes")
+const chatbotRoutes = require("./routes/chatbot");
+
+
 
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json()); 
+app.use(cors({
+  origin: "http://localhost:5173", // Your frontend URL
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"] // ✅ Allow Authorization headers
+}));
 
+app.use("/api/webhooks", webhookRoutes);
+app.use(express.json());
 
-
-//Routes
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
-app.use("/api/bookings",bookingRoutes);
+app.use("/api/bookings", bookingRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/admin", adminRoutes)
+app.use("/api", chatbotRoutes);
+
 
 
 
@@ -28,13 +40,9 @@ app.use("/api/payments", paymentRoutes);
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅MongoDB Connected"))
+  .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log(err));
-
-
-
-
 
 // Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀The Server is runnig  on the Http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));

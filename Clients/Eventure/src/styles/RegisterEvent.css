@@ -1,0 +1,491 @@
+/* RegisterEvent.css */
+.register-event-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    animation: slideInFromTop 0.5s ease-out;
+  }
+  
+  @keyframes slideInFromTop {
+    0% {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  h1 {
+    color: #858585;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    position: relative;
+  }
+  
+  h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background-color: #3498db;
+    animation: expandWidth 0.8s forwards 0.3s;
+  }
+  
+  @keyframes expandWidth {
+    to {
+      width: 100px;
+    }
+  }
+  
+  .event-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .form-row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .form-row .form-group {
+    flex: 1;
+    min-width: 200px;
+  }
+  
+  label {
+    font-weight: 600;
+    color: #555;
+    font-size: 0.9rem;
+    transform: translateY(0);
+    transition: transform 0.2s, color 0.2s;
+  }
+  
+  label:hover {
+    color: #3498db;
+    transform: translateY(-2px);
+  }
+  
+  input, select, textarea {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    transform: scale(1.01);
+  }
+  
+  input.error, select.error, textarea.error {
+    border-color: #e74c3c;
+    animation: shake 0.5s;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+  }
+  
+  .error-message {
+    color: #e74c3c;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    animation: fadeInLeft 0.3s;
+  }
+  
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .form-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .submit-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .submit-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .submit-button:active {
+    transform: translateY(0);
+  }
+  
+  .submit-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+  }
+  
+  .submit-button:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+  }
+  
+  @keyframes ripple {
+    0% {
+      transform: scale(0, 0);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(30, 30);
+      opacity: 0;
+    }
+  }
+  
+  .success-message {
+    background-color: #dff0d8;
+    color: #3c763d;
+    padding: 2rem;
+    border-radius: 4px;
+    text-align: center;
+    animation: bounceIn 0.75s;
+  }
+  
+  @keyframes bounceIn {
+    0%, 20%, 40%, 60%, 80%, 100% {
+      animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    }
+    0% {
+      opacity: 0;
+      transform: scale3d(0.3, 0.3, 0.3);
+    }
+    20% {
+      transform: scale3d(1.1, 1.1, 1.1);
+    }
+    40% {
+      transform: scale3d(0.9, 0.9, 0.9);
+    }
+    60% {
+      opacity: 1;
+      transform: scale3d(1.03, 1.03, 1.03);
+    }
+    80% {
+      transform: scale3d(0.97, 0.97, 0.97);
+    }
+    100% {
+      opacity: 1;
+      transform: scale3d(1, 1, 1);
+    }
+  }
+  
+  .success-message h2 {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Staggered animation for form groups */
+  .form-group:nth-child(1) { animation-delay: 0.1s; }
+  .form-group:nth-child(2) { animation-delay: 0.2s; }
+  .form-group:nth-child(3) { animation-delay: 0.3s; }
+  .form-group:nth-child(4) { animation-delay: 0.4s; }
+  .form-group:nth-child(5) { animation-delay: 0.5s; }
+  .form-group:nth-child(6) { animation-delay: 0.6s; }
+  .form-group:nth-child(7) { animation-delay: 0.7s; }
+  
+  /* Responsive styles */
+  @media (max-width: 768px) {
+    .register-event-container {
+      padding: 1.5rem;
+      margin: 1rem;
+    }
+    
+    .form-row {
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    
+    .form-row .form-group {
+      width: 100%;
+    }
+    
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+  /* ImageUpload.css */
+.image-upload-container {
+    width: 100%;
+  }
+  
+  .upload-area {
+    border: 2px dashed #ccc;
+    border-radius: 6px;
+    padding: 1.5rem;
+    text-align: center;
+    position: relative;
+    background-color: #f9f9f9;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .upload-area:hover {
+    border-color: #3498db;
+    transform: translateY(-2px);
+  }
+  
+  .upload-area.drag-active {
+    border-color: #3498db;
+    background-color: rgba(52, 152, 219, 0.1);
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  .file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  
+  .upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  
+  .upload-placeholder:hover {
+    transform: scale(1.05);
+  }
+  
+  .upload-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #777;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  .upload-placeholder p {
+    margin: 0.5rem 0;
+    color: #555;
+  }
+  
+  .upload-placeholder small {
+    color: #888;
+  }
+  
+  .preview-container {
+    position: relative;
+    padding: 0.5rem;
+    animation: zoomIn 0.4s;
+  }
+  
+  @keyframes zoomIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .image-preview {
+    max-width: 100%;
+    max-height: 250px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .image-preview:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
+  }
+  
+  .change-button {
+    display: block;
+    margin: 1rem auto 0;
+    padding: 0.5rem 1rem;
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s;
+    opacity: 0;
+    animation: fadeInUp 0.4s forwards 0.2s;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .change-button:hover {
+    background-color: #e4e4e4;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* File Upload Animation */
+  .upload-area::before {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(to right, transparent, #3498db, transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .upload-area.drag-active::before {
+    animation: slideUpDown 2s infinite;
+    opacity: 0.3;
+  }
+  
+  @keyframes slideUpDown {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-200px);
+    }
+    100% {
+      transform: translateY(-400px);
+    }
+  }
+  /* Add these styles to RegisterEvent.css for the animated submit button */
+
+/* Submit button loading animation */
+.submit-button.submitting {
+    background-color: #2980b9;
+    pointer-events: none;
+    position: relative;
+  }
+  
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    position: absolute;
+    right: 1rem;
+    top: calc(50% - 10px);
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Focused label animation */
+  label.focused {
+    color: #3498db;
+    transform: translateY(-3px);
+  }
+  
+  /* Form field focus outline animation */
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  }
+  
+  /* Form field appearance animation */
+  .form-group {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeInUp 0.5s forwards;
+  }
+  
+  /* Staggered animation for form appearance */
+  .form-group:nth-child(1) { animation-delay: 0.1s; }
+  .form-group:nth-child(2) { animation-delay: 0.15s; }
+  .form-group:nth-child(3) { animation-delay: 0.2s; }
+  .form-group:nth-child(4) { animation-delay: 0.25s; }
+  .form-group:nth-child(5) { animation-delay: 0.3s; }
+  .form-group:nth-child(6) { animation-delay: 0.35s; }
+  .form-group:nth-child(7) { animation-delay: 0.4s; }
+  .form-actions { animation-delay: 0.45s; }

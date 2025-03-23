@@ -1,0 +1,71 @@
+/* Events Page Styling */
+
+/* Hero Section */
+.events-hero-section {
+    background: url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80') center/cover no-repeat;
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    position: relative;
+  }
+  
+  .events-hero-section::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  .events-hero-section h1, .events-hero-section p {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Event Filters */
+  .form-control, .form-select {
+    border-radius: 8px;
+    padding: 10px;
+  }
+  
+  .btn-primary {
+    background-color: #4f46e5;
+    border: none;
+    margin-top: 10px;
+  }
+  
+  .btn-primary:hover {
+    background-color: #4338ca;
+  }
+  
+  /* Event Cards */
+  .event-card {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .event-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .event-card img {
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .event-card .card-body {
+    text-align: center;
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .events-hero-section {
+      height: 40vh;
+    }
+  }
+  
