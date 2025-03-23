@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Plus, Minus } from "lucide-react";
 import axios from "axios";
-import "../styles/EventCheckout.css";
+import "../styles/Eventcheckout.css";
 import API from "../services/api";
 
 const EventCheckout = () => {
