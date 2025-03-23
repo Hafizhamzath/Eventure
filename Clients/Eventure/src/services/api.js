@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://eventure-backend-i38o.onrender.com",
 });
 
 // Function to handle API errors consistently
@@ -39,7 +39,7 @@ export const fetchUserProfile = async () => {
   console.log("🚀 Sending Token:", token);
 
   try {
-    const response = await fetch("http://localhost:5000/api/auth/profile", {
+    const response = await fetch("https://eventure-backend-i38o.onrender.com/api/auth/profile", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export const updateUserProfile = async (profileData) => {
   console.log("🚀 Sending Token:", token);
 
   try {
-    const response = await fetch("http://localhost:5000/api/auth/profile", {
+    const response = await fetch("https://eventure-backend-i38o.onrender.com/api/auth/profile", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
