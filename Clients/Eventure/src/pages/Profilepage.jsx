@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import "../styles/Profile.css";
+import "../styles/profile.css";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
