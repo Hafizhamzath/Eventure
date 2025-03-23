@@ -15,7 +15,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: "http://localhost:5173", // Your frontend URL
+  origin: "https://eventure-backend-i38o.onrender.com", // Your frontend URL
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"] // ✅ Allow Authorization headers
 }));
