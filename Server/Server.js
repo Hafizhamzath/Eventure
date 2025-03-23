@@ -7,8 +7,7 @@ const eventRoutes = require("./routes/eventRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const webhookRoutes = require("./routes/webhookRoutes")
-const adminRoutes = require("./routes/adminRoutes")
-const chatbotRoutes = require("./routes/chatbot");
+const adminRoutes = require("./routes/adminRoutes");
 
 
 
