@@ -126,7 +126,7 @@ function Login() {
 
         <div className="footer">
           <p>
-            Don't have an account? <a href="/register">Sign up</a>
+            Don't have an account? <a href="api/register">Sign up</a>
           </p>
         </div>
       </div>
