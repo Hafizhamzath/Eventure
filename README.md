@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ### **Eventure - Event Booking Platform** 🎟️✨  
 
 **Eventure** is a **full-stack event booking platform** that allows users to browse, book, and manage events effortlessly. It features a **secure authentication system, event management, online payments, and QR-based ticketing.**  
@@ -46,3 +47,7 @@
 
 
 
+=======
+# Eventure
+Eventure - Event Booking Platform 🎟️✨ Eventure is a full-stack event booking platform that allows users to browse, book, and manage events effortlessly. It features a secure authentication system, event management, online payments, and QR-based ticketing.
+>>>>>>> a35e4df7e8fca10a246611f8bb417b2c88d9d8e3
