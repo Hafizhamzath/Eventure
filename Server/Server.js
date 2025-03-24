@@ -15,7 +15,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: "https://eventure-backend-i38o.onrender.com", // Your frontend URL
+  origin: "https://eventure-bo63.onrender.com/", // Your frontend URL
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"] // ✅ Allow Authorization headers
 }));
@@ -29,6 +29,10 @@ app.use("/api/events", eventRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/admin", adminRoutes)
+
+app.get('/',(req,res)=>{
+  res.json("Hello World")
+})
 
 
 

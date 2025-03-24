@@ -177,7 +177,7 @@ export const deleteUser = async (userId) => {
 // ✅ Updated Event Management API Calls
 export const fetchPublicEvents = async () => {
   try {
-    const { data } = await API.get("/api/events/public");
+    const { data } = await API.get("/events/public");
     return data;
   } catch (error) {
     return handleApiError(error, "Failed to fetch events");

@@ -1,6 +1,6 @@
 // src/services/api.js
 
-const API_BASE_URL =  'http://localhost:5000/api';
+const API_BASE_URL =  'https://eventure-backend-i38o.onrender.com/api';
 
 // Generic request function with authentication
 const makeRequest = async (endpoint, method = 'GET', data = null, token) => {
