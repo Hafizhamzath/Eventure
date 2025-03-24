@@ -17,7 +17,7 @@ const Events = () => {
   const [location, setLocation] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/events/public') // Public API for all users
+    axios.get('https://eventure-backend-1ewk.onrender.com/api/events/public') // Public API for all users
       .then(response => {
         setEvents(response.data);
         setFilteredEvents(response.data);
