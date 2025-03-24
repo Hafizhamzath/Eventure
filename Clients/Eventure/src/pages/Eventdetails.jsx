@@ -1,12 +1,11 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useState, useEffect } from "react";
-import "../styles/eventDetails.css"
+import "../styles/eventDetails.css";
 import API from "../services/api";
 
 const EventDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
   const [event, setEvent] = useState(null);
   const [relatedEvents, setRelatedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,21 +20,26 @@ const EventDetails = () => {
 
     const fetchEvent = async () => {
       try {
-        const eventResponse = await API.get(`/events/${id}`);
+        const token = localStorage.getItem("token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+        // Fetch event details
+        const eventResponse = await API.get(`/events/${id}`, { headers });
         setEvent(eventResponse.data);
-    
+        
+        // Fetch related events
         const relatedResponse = await API.get(
-          `/events?category=${eventResponse.data.category}&limit=3`
+          `/events?category=${eventResponse.data.category}&limit=3`,
+          { headers }
         );
         setRelatedEvents(relatedResponse.data);
       } catch (err) {
-        console.error("Error fetching event:", err);
-        setError(err.message);
+        console.error("Error fetching event:", err.response?.data || err.message);
+        setError(err.response?.data?.message || "Something went wrong");
       } finally {
         setLoading(false);
       }
     };
-    
 
     fetchEvent();
   }, [id]);
@@ -46,7 +50,7 @@ const EventDetails = () => {
       setError("Event ID is missing.");
       return;
     }
-    navigate(`/checkout/${id}`); // Navigate to the Checkout page with the event ID
+    navigate(`/checkout/${id}`);
   };
 
   if (loading) return <div className="text-center mt-5">Loading...</div>;
@@ -62,7 +66,7 @@ const EventDetails = () => {
           backgroundImage: `url(${event.image || "https://via.placeholder.com/1200x400"})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          height: "400px", // Fixed height for the hero section
+          height: "400px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -106,7 +110,7 @@ const EventDetails = () => {
                   <div className="d-flex align-items-center gap-2">
                     <i className="fas fa-user text-primary"></i>
                     <div>
-                      <strong>Organizer:</strong> {event.organizer.name}
+                      <strong>Organizer:</strong> {event.organizer?.name || "N/A"}
                     </div>
                   </div>
                   <div className="d-flex align-items-center gap-2">
@@ -118,7 +122,7 @@ const EventDetails = () => {
                   <div className="d-flex align-items-center gap-2">
                     <i className="fas fa-envelope text-primary"></i>
                     <div>
-                      <strong>Email:</strong> {event.email}
+                      <strong>Email:</strong> {event.email || "N/A"}
                     </div>
                   </div>
                 </div>
@@ -138,7 +142,7 @@ const EventDetails = () => {
                   </div>
                   <button
                     className="btn btn-primary w-100 py-3 fs-5"
-                    onClick={handleBookNow} // Enable the button and handle click
+                    onClick={handleBookNow}
                   >
                     <i className="fas fa-shopping-cart me-2"></i>Book Now
                   </button>
@@ -150,33 +154,35 @@ const EventDetails = () => {
       </div>
 
       {/* Related Events Section */}
-      <div className="container my-5">
-        <h3 className="mb-4">Related Events</h3>
-        <div className="row g-4">
-          {relatedEvents.map((relatedEvent) => (
-            <div key={relatedEvent._id} className="col-md-4">
-              <div className="card h-100 border-0 shadow-sm">
-                <img
-                  src={relatedEvent.image || "https://via.placeholder.com/400x200"}
-                  className="card-img-top"
-                  alt={relatedEvent.title}
-                  style={{ height: "200px", objectFit: "cover" }}
-                />
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title">{relatedEvent.title}</h5>
-                  <p className="card-text">{relatedEvent.description}</p>
-                  <Link
-                    to={`/events/${relatedEvent._id}`}
-                    className="btn btn-primary mt-auto"
-                  >
-                    View Details
-                  </Link>
+      {relatedEvents.length > 0 && (
+        <div className="container my-5">
+          <h3 className="mb-4">Related Events</h3>
+          <div className="row g-4">
+            {relatedEvents.map((relatedEvent) => (
+              <div key={relatedEvent._id} className="col-md-4">
+                <div className="card h-100 border-0 shadow-sm">
+                  <img
+                    src={relatedEvent.image || "https://via.placeholder.com/400x200"}
+                    className="card-img-top"
+                    alt={relatedEvent.title}
+                    style={{ height: "200px", objectFit: "cover" }}
+                  />
+                  <div className="card-body d-flex flex-column">
+                    <h5 className="card-title">{relatedEvent.title}</h5>
+                    <p className="card-text text-truncate">{relatedEvent.description}</p>
+                    <Link
+                      to={`/events/${relatedEvent._id}`}
+                      className="btn btn-primary mt-auto"
+                    >
+                      View Details
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
