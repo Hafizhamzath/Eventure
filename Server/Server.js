@@ -15,10 +15,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: "https://eventure-o8k3.onrender.com", // Your frontend URL
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"] // ✅ Allow Authorization headers
+  origin: "https://eventure-o8k3.onrender.com", // No trailing slash
+  methods: ["POST", "GET", "OPTIONS"],
+  credentials: true
 }));
+
 app.use(express.json());
 
 
