@@ -84,19 +84,15 @@ API.interceptors.request.use(async (config) => {
 // ✅ Updated User Authentication API Calls
 const registerUser = async (userData) => {
   try {
-    const response = await fetch("https://eventure-o8k3.onrender.com/api/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData),
-    });
-
-    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
-    const data = await response.json();
-    console.log("Response:", data);
-    return data;
+    const response = await axios.post(
+      "https://eventure-o8k3.onrender.com/api/register",
+      userData,
+      { headers: { "Content-Type": "application/json" } }
+    );
+    console.log("Response:", response.data);
+    return response.data;
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error("Error:", error.response ? error.response.data : error.message);
   }
 };
 export const loginUser = async (credentials) => {
