@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://eventure-backend-i38o.onrender.com",
+  baseURL: "https://eventure-backend-1ewk.onrender.com",
 });
 
 // Function to handle API errors consistently
@@ -35,55 +35,24 @@ const refreshAuthToken = async () => {
 
 
 export const fetchUserProfile = async () => {
-  const token = localStorage.getItem("token");
-  console.log("🚀 Sending Token:", token);
-
   try {
-    const response = await fetch("https://eventure-backend-i38o.onrender.com/api/auth/profile", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch user profile");
-    }
-
-    const data = await response.json();
-    console.log("API Response:", data); // Log the API response
+    const { data } = await API.get("/auth/profile");
+    console.log("API Response:", data);
     return data;
   } catch (error) {
     console.error("Error fetching user profile:", error);
-    throw error;
+    throw handleApiError(error, "Failed to fetch profile");
   }
 };
 
 export const updateUserProfile = async (profileData) => {
-  const token = localStorage.getItem("token");
-  console.log("🚀 Sending Token:", token);
-
   try {
-    const response = await fetch("https://eventure-backend-i38o.onrender.com/api/auth/profile", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(profileData),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to update profile");
-    }
-
-    const data = await response.json();
-    console.log("API Response:", data); // Log the API response
+    const { data } = await API.put("/auth/profile", profileData);
+    console.log("API Response:", data);
     return data;
   } catch (error) {
     console.error("Error updating profile:", error);
-    throw error;
+    throw handleApiError(error, "Failed to update profile");
   }
 };
 

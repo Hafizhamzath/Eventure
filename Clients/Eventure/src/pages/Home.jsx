@@ -51,7 +51,7 @@ const Home = () => {
   });
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/events/public')
+    axios.get('https://eventure-backend-1ewk.onrender.com/api/events/public')
       .then(response => setEvents(response.data))
       .catch(error => console.error('Error fetching events:', error));
     
