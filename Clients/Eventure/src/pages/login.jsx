@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Mail, Lock, AlertCircle } from "lucide-react";
 import { loginUser } from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Changed from useNavigate to include Link
 import "../styles/login.css";
 
 function Login() {
@@ -10,6 +10,7 @@ function Login() {
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false); // Added loading state
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -22,11 +23,11 @@ function Login() {
     const newErrors = {};
 
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "That email doesn't look quite right. Mind double-checking?";
+      newErrors.email = "Please enter a valid email address";
     }
 
     if (formData.password.length < 8) {
-      newErrors.password = "Let's make that password a bit stronger - at least 8 characters!";
+      newErrors.password = "Password must be at least 8 characters";
     }
 
     setErrors(newErrors);
@@ -35,25 +36,29 @@ function Login() {
 
   const handleLogin = async () => {
     if (!validateForm()) return;
-  
+    
+    setIsLoading(true);
     try {
       const response = await loginUser(formData);
-      localStorage.setItem("token", response.token); // Save token
-      localStorage.setItem("user", JSON.stringify(response.user)); // Save user data
-  
+      localStorage.setItem("token", response.token);
+      localStorage.setItem("user", JSON.stringify(response.user));
+
       // Redirect based on role
       if (response.user.role === "admin") {
         navigate("/admin-dashboard");
       } else if (response.user.role === "organizer") {
         navigate("/organizer-dashboard");
       } else {
-        navigate("/"); // Default homepage for attendees
+        navigate("/");
       }
     } catch (error) {
-      setErrors({ backend: error.message || "Login failed. Please try again." });
+      setErrors({ 
+        backend: error.response?.data?.message || "Login failed. Please try again." 
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
-  
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
@@ -119,14 +124,18 @@ function Login() {
             </div>
           )}
 
-          <button onClick={handleLogin} className="button">
-            Log In
+          <button 
+            onClick={handleLogin} 
+            className="button"
+            disabled={isLoading}
+          >
+            {isLoading ? "Logging in..." : "Log In"}
           </button>
         </div>
 
         <div className="footer">
           <p>
-            Don't have an account? <a href="api/register">Sign up</a>
+            Don't have an account? <Link to="/register">Sign up</Link>
           </p>
         </div>
       </div>
