@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://eventure-backend-1ewk.onrender.com",
+  baseURL: "https://eventure-backend-1ewk.onrender.com/api",
 });
 
 // Function to handle API errors consistently
