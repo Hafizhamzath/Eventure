@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { User, Mail, Lock, Check, AlertCircle } from "lucide-react";
 import { registerUser } from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "../styles/register.css";
 
 function Registration() {
@@ -11,10 +11,11 @@ function Registration() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "attendee", // Default role
+    role: "attendee",
   });
   const [errors, setErrors] = useState({});
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const steps = [
@@ -56,27 +57,27 @@ function Registration() {
     switch (currentField) {
       case "name":
         if (!formData.name.trim()) {
-          newErrors.name = "I didn't catch your name. Could you share it with me?";
+          newErrors.name = "Please enter your name";
         }
         break;
       case "email":
         if (!/\S+@\S+\.\S+/.test(formData.email)) {
-          newErrors.email = "That email doesn't look quite right. Mind double-checking?";
+          newErrors.email = "Please enter a valid email address";
         }
         break;
       case "password":
         if (formData.password.length < 8) {
-          newErrors.password = "Let's make that password a bit stronger - at least 8 characters!";
+          newErrors.password = "Password must be at least 8 characters";
         }
         break;
       case "confirmPassword":
         if (formData.password !== formData.confirmPassword) {
-          newErrors.confirmPassword = "Oops! Those passwords don't match. Let's try again.";
+          newErrors.confirmPassword = "Passwords don't match";
         }
         break;
       case "role":
         if (!formData.role) {
-          newErrors.role = "Please select how you'd like to participate! 🤗";
+          newErrors.role = "Please select a role";
         }
         break;
     }
@@ -85,40 +86,44 @@ function Registration() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleNext = async () => {
+  const handleSubmit = async () => {
     if (!validateStep()) return;
-  
+
     if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1);
-    } else {
-      console.log("Final Form Data Before Sending:", formData); // ✅ Debugging
-      try {
-        await registerUser(formData);
-        alert("Registration successful! Please log in.");
-        navigate("/login");
-      } catch (error) {
-        console.error("Backend Error:", error); // ✅ Debugging
-        setErrors({ backend: error.message || "Registration failed. Please try again." });
-      }
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await registerUser({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role
+      });
+      alert("Registration successful! Please log in.");
+      navigate("/login");
+    } catch (error) {
+      console.error("Registration error:", error);
+      setErrors({ 
+        backend: error.response?.data?.message || "Registration failed. Please try again." 
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
-  
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleNext();
-    }
+    if (e.key === "Enter") handleSubmit();
   };
 
   const getInputType = (field) => {
     switch (field) {
-      case "email":
-        return "email";
+      case "email": return "email";
       case "password":
-      case "confirmPassword":
-        return "password";
-      default:
-        return "text";
+      case "confirmPassword": return "password";
+      default: return "text";
     }
   };
 
@@ -126,14 +131,13 @@ function Registration() {
     <div className="role-selection">
       <button
         type="button"
-        onClick={() => handleRoleSelect("organizer")} // 🔥 Changed from "host" to "organizer"
+        onClick={() => handleRoleSelect("organizer")}
         className={`role-button ${formData.role === "organizer" ? "selected" : ""}`}
       >
         <span>🎪</span>
         <h3>Event Organizer</h3>
-        <p>Create and manage your own events, set schedules, and connect with attendees</p>
+        <p>Create and manage your own events</p>
       </button>
-  
       <button
         type="button"
         onClick={() => handleRoleSelect("attendee")}
@@ -141,17 +145,16 @@ function Registration() {
       >
         <span>🎭</span>
         <h3>Event Attendee</h3>
-        <p>Discover exciting events, book tickets, and join amazing experiences</p>
+        <p>Discover and attend events</p>
       </button>
     </div>
   );
-  
 
   return (
     <div className="registration-container">
       <div className="registration-card">
         <div className="header">
-          <h1>Event Registration</h1>
+          <h1>Create Your Account</h1>
           <p>Step {currentStep + 1} of {steps.length}</p>
         </div>
 
@@ -191,12 +194,10 @@ function Registration() {
                 ))}
               </div>
               <p>
-                Password strength: {
-                  passwordStrength === 0 ? "Weak" :
-                  passwordStrength === 1 ? "Fair" :
-                  passwordStrength === 2 ? "Good" :
-                  passwordStrength === 3 ? "Strong" : "Very Strong"
-                }
+                {passwordStrength === 0 ? "Weak" :
+                 passwordStrength === 1 ? "Fair" :
+                 passwordStrength === 2 ? "Good" :
+                 passwordStrength === 3 ? "Strong" : "Very Strong"}
               </p>
             </div>
           )}
@@ -216,8 +217,14 @@ function Registration() {
           )}
         </div>
 
-        <button onClick={handleNext} className="button">
-          {currentStep === steps.length - 1 ? (
+        <button 
+          onClick={handleSubmit} 
+          className="button"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            "Processing..."
+          ) : currentStep === steps.length - 1 ? (
             <>
               Complete Registration
               <Check size={20} />
@@ -229,7 +236,7 @@ function Registration() {
 
         <div className="footer">
           <p>
-            Already have an account? <a href="/login">Log in</a>
+            Already have an account? <Link to="/login">Log in</Link>
           </p>
         </div>
       </div>
