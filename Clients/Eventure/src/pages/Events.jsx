@@ -6,6 +6,7 @@ import "../styles/events.css"
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { format } from 'date-fns';
+import { Link } from "react-router-dom";
 
 
 
@@ -107,28 +108,29 @@ const Events = () => {
                 <Card.Body>
                   <Card.Title>{event.title}</Card.Title>
                   <Card.Text>{format(new Date(event.date), "MMMM dd, yyyy hh:mm a")} - {event.venue}</Card.Text>
-                  <Button
-                    variant="primary"
-                    onClick={() => {
-                      const user = localStorage.getItem("user"); // Check if user is logged in
-                      if (user) {
-                        window.location.href = `/events/${event._id}`; // Redirect if logged in
-                      } else {
-                        toast.warn("Login First", {
-                          position: "top-right", // Toast position
-                          autoClose: 2000, // Auto close after 2 seconds
-                          hideProgressBar: false, // Show progress bar
-                          closeOnClick: true,
-                          pauseOnHover: true,
-                          draggable: true,
-                          theme: "light",
-                        });
-                      }
-                    }}
-                  >
-                    View Details
-                  </Button>
-                </Card.Body>
+                      <Button variant="primary">
+                      <Link 
+                        to={localStorage.getItem("user") ? `/events/${event._id}` : "#"}
+                        className="event-link"
+                        onClick={(e) => {
+                          if (!localStorage.getItem("user")) {
+                            e.preventDefault(); // Prevent navigation if not logged in
+                            toast.warn("Login First", {
+                              position: "top-right",
+                              autoClose: 2000,
+                              hideProgressBar: false,
+                              closeOnClick: true,
+                              pauseOnHover: true,
+                              draggable: true,
+                              theme: "light",
+                            });
+                          }
+                        }}
+                      >
+                        View Details
+                      </Link>
+                    </Button>
+               </Card.Body>
               </Card>
             </Col>
           )) : <p className="text-center w-100">No events found.</p>}
