@@ -133,8 +133,8 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 1 }}
           >
-            <Button variant="primary" size="lg" href="/events" className="me-3 btn-animated">Browse Events</Button>
-            <Button variant="secondary" size="lg" href="/register" className="btn-animated">Sign Up</Button>
+           <Link to="/events" className="btn btn-primary me-3 btn-animated">Browse Events</Link>
+            <Link to="/register" className="btn btn-secondary btn-animated">Sign Up</Link>
           </motion.div>
         </Container>
       </div>
