@@ -1,6 +1,7 @@
 import  { useState } from 'react';
 import { Calendar, Users, BarChart3, CreditCard, CheckCircle, X } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import '../styles/CreationHome.css';
 
 
@@ -295,7 +296,7 @@ function CreationHome() {
                 <button type="submit" className="submit-button">Request Demo</button>
                 
                 <p className="form-disclaimer">
-                  By submitting this form, you agree to our <a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a>.
+                By submitting this form, you agree to our <Link to="/privacy-policy">Privacy Policy</Link> and <Link to="/terms-of-service">Terms of Service</Link>.
                 </p>
               </form>
             ) : (
