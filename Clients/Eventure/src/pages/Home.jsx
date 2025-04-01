@@ -166,19 +166,25 @@ const Home = () => {
                     <Card.Body>
                       <Card.Title>{event.title}</Card.Title>
                       <Card.Text>{format(new Date(event.date), "MMMM dd, yyyy hh:mm a")} - {event.venue}</Card.Text>
-                      <Button  variant="primary" onClick={() => {
-                          const user = localStorage.getItem("user"); // Check if user is logged in
-                          if (user) {
-                            window.location.href = `/events/${event._id}`; // Navigate to event page
-                          } else {
-                            toast.warn("Login First", { position: "top-right",  // Set position to top-right
-                              autoClose: 2000,        // Close after 2 seconds
-                              hideProgressBar: false, // Show progress bar
-                              closeOnClick: true,
-                              pauseOnHover: true,
-                              draggable: true,
-                              theme: "light",});
-                          }}}>View Details</Button>
+                      <Link to={localStorage.getItem("user") ? `/events/${event._id}` : "#"}
+                      className="btn btn-primary"
+                      onClick={(e) => {
+                        if (!localStorage.getItem("user")) {
+                          e.preventDefault(); // Prevent navigation if not logged in
+                          toast.warn("Login First", {
+                            position: "top-right",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            theme: "light",
+                          });
+                        }
+                      }}
+                    >
+                      View Details
+                    </Link>
                     </Card.Body>
                   </Card>
                 </motion.div>
