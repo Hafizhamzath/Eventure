@@ -4,13 +4,13 @@ const API = axios.create({
   baseURL: "https://eventure-backend-1ewk.onrender.com/api",
 });
 
-// Function to handle API errors consistently
+// ✅ Function to handle API errors consistently
 const handleApiError = (error, defaultMessage) => {
   console.error(defaultMessage, error.response?.data || error.message);
   throw error.response?.data || { message: defaultMessage };
 };
 
-// ✅ Token Management - Check Expiry and Refresh if needed
+// ✅ Token Expiration Check
 const checkTokenExpiration = (token) => {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
@@ -20,6 +20,7 @@ const checkTokenExpiration = (token) => {
   }
 };
 
+// ✅ Refresh Token Function
 const refreshAuthToken = async () => {
   try {
     const response = await API.post("/auth/refresh");
@@ -33,6 +34,62 @@ const refreshAuthToken = async () => {
   return null;
 };
 
+// ✅ Request Interceptor
+API.interceptors.request.use(
+  async (config) => {
+    let token = localStorage.getItem("token");
+
+    if (token && checkTokenExpiration(token)) {
+      console.log("🔄 Token expired, refreshing...");
+      token = await refreshAuthToken();
+
+      if (token) {
+        localStorage.setItem("token", token);
+      } else {
+        console.warn("⚠️ Refresh failed. Logging out.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "/login"; // Redirect to login
+        return Promise.reject("Unable to refresh token");
+      }
+    }
+
+    if (token) {
+      console.log("🚀 Sending Token:", `Bearer ${token}`);
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      console.log("❌ No valid token found");
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// ✅ User Authentication API Calls
+export const registerUser = async (formData) => {
+  try {
+    const { data } = await API.post("/auth/register", formData);
+    return data;
+  } catch (error) {
+    return handleApiError(error, "Registration Failed");
+  }
+};
+
+export const loginUser = async (credentials) => {
+  try {
+    const { data } = await API.post("/auth/login", credentials);
+
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+    }
+
+    return data;
+  } catch (error) {
+    return handleApiError(error, "Login Failed");
+  }
+};
 
 export const fetchUserProfile = async () => {
   try {
@@ -56,57 +113,7 @@ export const updateUserProfile = async (profileData) => {
   }
 };
 
-// ✅ Add a request interceptor to include the JWT token in headers
-API.interceptors.request.use(async (config) => {
-  let token = localStorage.getItem("token");
-
-  if (token) {
-    if (checkTokenExpiration(token)) {
-      console.log("🔄 Token expired, refreshing...");
-      token = await refreshAuthToken();
-      if (token) {
-        localStorage.setItem("token", token);
-      }
-    }
-    if (token) {
-      console.log("🚀 Sending Token:", `Bearer ${token}`);
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      console.warn("⚠️ No valid token found after refresh attempt");
-    }
-  } else {
-    console.log("❌ No token found in localStorage");
-  }
-
-  return config;
-});
-
-// ✅ Updated User Authentication API Calls
-export const registerUser = async (formData) => {
-  try {
-    const { data } = await API.post("/auth/register", formData);
-    return data;
-  } catch (error) {
-    return handleApiError(error, "Registration Failed");
-  }
-};
-
-export const loginUser = async (credentials) => {
-  try {
-    const { data } = await API.post("/auth/login", credentials);
-
-    if (data.token) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user)); // Store user details
-    }
-
-    return data;
-  } catch (error) {
-    return handleApiError(error, "Login Failed");
-  }
-};
-
-// ✅ Updated Admin-Specific API Calls
+// ✅ Admin-Specific API Calls
 export const fetchAllUsers = async () => {
   try {
     const { data } = await API.get("/admin/users");
@@ -143,7 +150,7 @@ export const deleteUser = async (userId) => {
   }
 };
 
-// ✅ Updated Event Management API Calls
+// ✅ Event Management API Calls
 export const fetchPublicEvents = async () => {
   try {
     const { data } = await API.get("/events/public");
@@ -180,18 +187,15 @@ export const deleteEvent = async (eventId) => {
   }
 };
 
-// ✅ Updated Booking and Payment API Calls
+// ✅ Booking & Payment API Calls
 export const fetchAllBookings = async () => {
   try {
-    const { data } = await API.get("/admin/bookings"); // Fetch bookings with populated details
+    const { data } = await API.get("/admin/bookings");
     return data;
   } catch (error) {
     return handleApiError(error, "Failed to fetch bookings");
   }
 };
-
-
-
 
 export const fetchAllPayments = async () => {
   try {
