@@ -25,7 +25,7 @@ const refreshAuthToken = async () => {
   try {
     const response = await API.post("/auth/refresh");
     if (response.data?.token) {
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("token", response.data.token); // Store new token in localStorage
       return response.data.token;
     }
   } catch (error) {
@@ -66,6 +66,25 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// ✅ Response Interceptor for handling 401 errors
+API.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // If error is 401 (Unauthorized) and the request has not been retried
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const newToken = await refreshAuthToken();
+      if (newToken) {
+        originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+        return API(originalRequest); // Retry the original request with the new token
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // ✅ User Authentication API Calls
 export const registerUser = async (formData) => {
   try {
@@ -82,7 +101,7 @@ export const loginUser = async (credentials) => {
 
     if (data.token) {
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(data.user)); // Store user details
     }
 
     return data;
