@@ -1,94 +1,87 @@
 import axios from "axios";
 
-// Create an Axios instance
 const API = axios.create({
   baseURL: "https://eventure-backend-1ewk.onrender.com/api",
 });
 
-// ✅ Function to handle API errors consistently
+// Function to handle API errors consistently
 const handleApiError = (error, defaultMessage) => {
   console.error(defaultMessage, error.response?.data || error.message);
   throw error.response?.data || { message: defaultMessage };
 };
 
-// ✅ Token Expiration Check
+// ✅ Token Management - Check Expiry and Refresh if needed
 const checkTokenExpiration = (token) => {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
-    // Check if the token has expired
     return payload.exp * 1000 < Date.now();
   } catch {
-    return true; // If token is malformed, assume it's expired
+    return true;
   }
 };
 
-// ✅ Refresh Token Function
 const refreshAuthToken = async () => {
   try {
     const response = await API.post("/auth/refresh");
     if (response.data?.token) {
-      localStorage.setItem("token", response.data.token); // Store new token in localStorage
+      localStorage.setItem("token", response.data.token);
       return response.data.token;
     }
   } catch (error) {
     console.error("Token refresh failed", error);
-    throw error;
   }
   return null;
 };
 
-// ✅ Request Interceptor
-API.interceptors.request.use(
-  async (config) => {
-    let token = localStorage.getItem("token");
 
-    if (token && checkTokenExpiration(token)) {
+export const fetchUserProfile = async () => {
+  try {
+    const { data } = await API.get("/auth/profile");
+    console.log("API Response:", data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    throw handleApiError(error, "Failed to fetch profile");
+  }
+};
+
+export const updateUserProfile = async (profileData) => {
+  try {
+    const { data } = await API.put("/auth/profile", profileData);
+    console.log("API Response:", data);
+    return data;
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    throw handleApiError(error, "Failed to update profile");
+  }
+};
+
+// ✅ Add a request interceptor to include the JWT token in headers
+API.interceptors.request.use(async (config) => {
+  let token = localStorage.getItem("token");
+
+  if (token) {
+    if (checkTokenExpiration(token)) {
       console.log("🔄 Token expired, refreshing...");
-      token = await refreshAuthToken();  // Refresh the token if expired
-
+      token = await refreshAuthToken();
       if (token) {
         localStorage.setItem("token", token);
-      } else {
-        console.warn("⚠️ Refresh failed. Logging out.");
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "/login"; // Redirect to login if refresh fails
-        return Promise.reject("Unable to refresh token");
       }
     }
-
     if (token) {
       console.log("🚀 Sending Token:", `Bearer ${token}`);
       config.headers.Authorization = `Bearer ${token}`;
     } else {
-      console.log("❌ No valid token found");
+      console.warn("⚠️ No valid token found after refresh attempt");
     }
-
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// ✅ Response Interceptor for handling 401 errors
-API.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // If error is 401 (Unauthorized) and the request has not been retried
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      const newToken = await refreshAuthToken();
-      if (newToken) {
-        originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
-        return API(originalRequest); // Retry the original request with the new token
-      }
-    }
-    return Promise.reject(error);
+  } else {
+    console.log("❌ No token found in localStorage");
   }
-);
 
-// ✅ User Authentication API Calls
+  return config;
+});
+
+// ✅ Updated User Authentication API Calls
 export const registerUser = async (formData) => {
   try {
     const { data } = await API.post("/auth/register", formData);
@@ -113,29 +106,7 @@ export const loginUser = async (credentials) => {
   }
 };
 
-export const fetchUserProfile = async () => {
-  try {
-    const { data } = await API.get("/auth/profile");
-    console.log("API Response:", data);
-    return data;
-  } catch (error) {
-    console.error("Error fetching user profile:", error);
-    throw handleApiError(error, "Failed to fetch profile");
-  }
-};
-
-export const updateUserProfile = async (profileData) => {
-  try {
-    const { data } = await API.put("/auth/profile", profileData);
-    console.log("API Response:", data);
-    return data;
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    throw handleApiError(error, "Failed to update profile");
-  }
-};
-
-// ✅ Admin-Specific API Calls
+// ✅ Updated Admin-Specific API Calls
 export const fetchAllUsers = async () => {
   try {
     const { data } = await API.get("/admin/users");
@@ -172,7 +143,7 @@ export const deleteUser = async (userId) => {
   }
 };
 
-// ✅ Event Management API Calls
+// ✅ Updated Event Management API Calls
 export const fetchPublicEvents = async () => {
   try {
     const { data } = await API.get("/events/public");
@@ -209,15 +180,18 @@ export const deleteEvent = async (eventId) => {
   }
 };
 
-// ✅ Booking & Payment API Calls
+// ✅ Updated Booking and Payment API Calls
 export const fetchAllBookings = async () => {
   try {
-    const { data } = await API.get("/admin/bookings");
+    const { data } = await API.get("/admin/bookings"); // Fetch bookings with populated details
     return data;
   } catch (error) {
     return handleApiError(error, "Failed to fetch bookings");
   }
 };
+
+
+
 
 export const fetchAllPayments = async () => {
   try {
@@ -228,5 +202,4 @@ export const fetchAllPayments = async () => {
   }
 };
 
-// Export API instance for usage in other parts of the app
 export default API;
