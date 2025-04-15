@@ -13,16 +13,16 @@ const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
-// Middleware
-app.use(cors({
-  origin: "https://eventure-o8k3.onrender.com", // ✅ Allow your frontend domain
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ Allow all necessary HTTP methods
-  allowedHeaders: ["Content-Type", "Authorization"], // ✅ Allow necessary headers
-  credentials: true
-}));
+const corsOptions = {
+  origin: "https://eventure-o8k3.onrender.com",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  optionsSuccessStatus: 200 // ✅ Important for legacy browsers
+};
 
-// ✅ Ensure preflight requests are handled
-app.options("*", cors());
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // ✅ Handles preflight with correct CORS headers
 
 app.use(express.json());
 
