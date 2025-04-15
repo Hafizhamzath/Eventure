@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// Create an Axios instance
 const API = axios.create({
   baseURL: "https://eventure-backend-1ewk.onrender.com/api",
 });
@@ -14,9 +15,10 @@ const handleApiError = (error, defaultMessage) => {
 const checkTokenExpiration = (token) => {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
+    // Check if the token has expired
     return payload.exp * 1000 < Date.now();
   } catch {
-    return true;
+    return true; // If token is malformed, assume it's expired
   }
 };
 
@@ -30,6 +32,7 @@ const refreshAuthToken = async () => {
     }
   } catch (error) {
     console.error("Token refresh failed", error);
+    throw error;
   }
   return null;
 };
@@ -41,7 +44,7 @@ API.interceptors.request.use(
 
     if (token && checkTokenExpiration(token)) {
       console.log("🔄 Token expired, refreshing...");
-      token = await refreshAuthToken();
+      token = await refreshAuthToken();  // Refresh the token if expired
 
       if (token) {
         localStorage.setItem("token", token);
@@ -49,7 +52,7 @@ API.interceptors.request.use(
         console.warn("⚠️ Refresh failed. Logging out.");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        window.location.href = "/login"; // Redirect to login
+        window.location.href = "/login"; // Redirect to login if refresh fails
         return Promise.reject("Unable to refresh token");
       }
     }
@@ -225,4 +228,5 @@ export const fetchAllPayments = async () => {
   }
 };
 
+// Export API instance for usage in other parts of the app
 export default API;

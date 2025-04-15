@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Mail, Lock, AlertCircle } from "lucide-react";
 import { loginUser } from "../services/api";
-import { useNavigate, Link } from "react-router-dom"; // Changed from useNavigate to include Link
+import { useNavigate, Link } from "react-router-dom"; 
 import "../styles/login.css";
 
 function Login() {
@@ -10,7 +10,7 @@ function Login() {
     password: "",
   });
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false); 
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -41,7 +41,7 @@ function Login() {
     try {
       const response = await loginUser(formData);
       localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
+      localStorage.setItem("user", JSON.stringify(response.user)); // Store user details
 
       // Redirect based on role
       if (response.user.role === "admin") {

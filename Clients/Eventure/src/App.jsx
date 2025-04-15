@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Home from "./pages/Home";
 import NavbarComponent from "./components/NavbarComponents";
 import FooterComponent from "./components/Footer";
@@ -28,27 +29,40 @@ import ProfilePage from "./pages/Profilepage";
 // Component to manage layout
 const Layout = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Define paths where Navbar and Footer should be hidden
   const hiddenPaths = ["/login", "/register", "/admin-dashboard", "/payment", "/success"];
-
   const shouldHideNavbarAndFooter = hiddenPaths.includes(location.pathname);
-
-  // Define paths where Chatbot should be displayed
-  const chatbotPaths = ["/", "/events", "/events/:id"];
-  const shouldDisplayChatbot = chatbotPaths.includes(location.pathname);
 
   return (
     <>
       {!shouldHideNavbarAndFooter && <NavbarComponent />}
       {children}
       {!shouldHideNavbarAndFooter && <FooterComponent />}
-      {shouldDisplayChatbot && <Chatbot />}
     </>
   );
 };
 
 const App = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login");
+    } else {
+      const tokenExpired = checkTokenExpiration(token);
+      if (tokenExpired) {
+        // If expired, clear token and user data, then redirect to login page
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login");
+      }
+    }
+  }, [navigate]);
+
   return (
     <Router>
       <Layout>
@@ -72,10 +86,7 @@ const App = () => {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/help" element={<HelpCenter />} />
           <Route path="/contact" element={<ContactUs />} />
-          <Route
-            path="/admin-dashboard"
-            element={<ProtectedRoute allowedRoles={["admin"]} />}
-          >
+          <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={["admin"]} />}>
             <Route index element={<AdminDashboard />} />
           </Route>
           <Route path="*" element={<h2 className="text-center mt-5">404 - Page Not Found</h2>} />
