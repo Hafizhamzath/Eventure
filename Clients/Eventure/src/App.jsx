@@ -26,6 +26,16 @@ import ContactUs from "./pages/contactUs";
 import Chatbot from "./components/Chatbot";
 import ProfilePage from "./pages/Profilepage";
 
+// Define checkTokenExpiration function
+const checkTokenExpiration = (token) => {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+};
+
 // Component to manage layout
 const Layout = ({ children }) => {
   const location = useLocation();
