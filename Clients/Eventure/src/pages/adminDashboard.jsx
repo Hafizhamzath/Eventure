@@ -1,4 +1,4 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -46,13 +46,14 @@ const AdminDashboard = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [showUserModal, setShowUserModal] = useState(false);
- const [editingUser, setEditingUser] = useState(null); 
- const [roleFilter, setRoleFilter] = useState("all");
- const [userForm, setUserForm] = useState({ name: "", email: "", password: "" });
- const [showModal, setShowModal] = useState(false); // Handle modal visibility
- const [eventData, setEventData] = useState({ title: "", description: "", date: "" });
- const [editingEventId, setEditingEventId] = useState(null); // Store event ID when editing
-
+  const [editingUser, setEditingUser] = useState(null); 
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [userForm, setUserForm] = useState({ name: "", email: "", password: "" });
+  const [showModal, setShowModal] = useState(false); // Handle modal visibility for events
+  const [eventData, setEventData] = useState({ title: "", description: "", date: "" });
+  const [editingEventId, setEditingEventId] = useState(null); // Store event ID when editing
+  const [showEventDeleteModal, setShowEventDeleteModal] = useState(false); // New modal for event deletion
+  const [eventToDelete, setEventToDelete] = useState(null); // Store event ID for deletion
 
   const navigate = useNavigate();
 
@@ -82,8 +83,6 @@ const AdminDashboard = () => {
   
     loadData();
   }, []);
-  
-  
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -98,35 +97,8 @@ const AdminDashboard = () => {
     console.log("🔍 Received userId for deletion:", userId);
     setUserToDelete(userId);
     setShowDeleteModal(true);
-};
+  };
 
-const handleSaveEvent = async () => {
-  if (!eventData.title || !eventData.date) {
-    alert("Title and Date are required!");
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem("token");
-
-    if (editingEventId) {
-      await updateEvent(editingEventId, eventData, token);
-      setEvents(events.map(event => event._id === editingEventId ? { ...event, ...eventData } : event));
-    } else {
-      const newEvent = await createEvent(eventData, token);
-      setEvents([...events, newEvent]);
-    }
-
-    setShowModal(false);
-    setEventData({ title: "", description: "", date: "" });
-    setEditingEventId(null);
-  } catch (error) {
-    console.error("Error saving event:", error);
-  }
-};
-
-
-  
   const confirmDeleteUser = async () => {
     if (!userToDelete) {
       console.error("❌ Error: No user ID provided for deletion!");
@@ -146,52 +118,112 @@ const handleSaveEvent = async () => {
       setUserToDelete(null);
     }
   };
-  
-
-
 
   const handleSaveUser = async () => {
     if (!editingUser) {
-        console.error("❌ Error: No user is being edited!");
-        return;
+      console.error("❌ Error: No user is being edited!");
+      return;
     }
-
-    console.log("📝 Updating user with ID:", editingUser?._id); // Debugging log
-    // console.log("📋 User data being sent:", userForm); // Check the data being passed
-
+  
+    console.log("📝 Updating user with ID:", editingUser?._id);
+  
     if (!editingUser._id) {
-        console.error("❌ Error: User ID is undefined!");
-        return;
+      console.error("❌ Error: User ID is undefined!");
+      return;
     }
-
+  
     try {
-        await updateUser(editingUser._id, userForm);
-        console.log("✅ User updated successfully");
-
-        setUsers(users.map(u => (u._id === editingUser._id ? { ...u, ...userForm } : u)));
+      await updateUser(editingUser._id, userForm);
+      console.log("✅ User updated successfully");
+      setUsers(users.map(u => (u._id === editingUser._id ? { ...u, ...userForm } : u)));
     } catch (error) {
-        console.error("❌ Error updating user:", error);
+      console.error("❌ Error updating user:", error);
     } finally {
-        setShowUserModal(false);
+      setShowUserModal(false);
     }
-};
-
-
-
-
+  };
 
   const handleAddUserClick = () => {
     setEditingUser(null);
     setUserForm({ name: "", email: "", password: "" });
     setShowUserModal(true);
-};
+  };
 
-const handleEditUserClick = (user) => {
+  const handleEditUserClick = (user) => {
     setEditingUser(user);
-    setUserForm({ name: user.name, email: user.email, password: "" }); // Password empty for security
+    setUserForm({ name: user.name, email: user.email, password: "" });
     setShowUserModal(true);
-};
+  };
 
+  // Event Handlers
+  const handleAddEventClick = () => {
+    setEditingEventId(null);
+    setEventData({ title: "", description: "", date: "" });
+    setShowModal(true);
+  };
+
+  const handleEditEventClick = (event) => {
+    setEditingEventId(event._id);
+    setEventData({
+      title: event.title || "",
+      description: event.description || "",
+      date: event.date ? new Date(event.date).toISOString().split("T")[0] : "",
+    });
+    setShowModal(true);
+  };
+
+  const handleDeleteEventClick = (eventId) => {
+    console.log("🔍 Received eventId for deletion:", eventId);
+    setEventToDelete(eventId);
+    setShowEventDeleteModal(true);
+  };
+
+  const confirmDeleteEvent = async () => {
+    if (!eventToDelete) {
+      console.error("❌ Error: No event ID provided for deletion!");
+      return;
+    }
+  
+    console.log("🗑️ Attempting to delete event with ID:", eventToDelete);
+  
+    try {
+      await deleteEvent(eventToDelete);
+      console.log("✅ Event deleted successfully");
+      setEvents(events.filter(event => event._id !== eventToDelete));
+    } catch (error) {
+      console.error("❌ Error deleting event:", error);
+    } finally {
+      setShowEventDeleteModal(false);
+      setEventToDelete(null);
+    }
+  };
+
+  const handleSaveEvent = async () => {
+    if (!eventData.title || !eventData.date) {
+      alert("Title and Date are required!");
+      return;
+    }
+  
+    try {
+      const token = localStorage.getItem("token");
+  
+      if (editingEventId) {
+        await updateEvent(editingEventId, eventData, token);
+        setEvents(events.map(event => 
+          event._id === editingEventId ? { ...event, ...eventData } : event
+        ));
+      } else {
+        const newEvent = await createEvent(eventData, token);
+        setEvents([...events, newEvent]);
+      }
+  
+      setShowModal(false);
+      setEventData({ title: "", description: "", date: "" });
+      setEditingEventId(null);
+    } catch (error) {
+      console.error("Error saving event:", error);
+    }
+  };
 
   const filteredUsers = users.filter(user => 
     user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -336,308 +368,354 @@ const handleEditUserClick = (user) => {
                     </Col>
                   </Row>
                   
-                  
-                {/* Recent Activities */}
-<Row>
-  <Col>
-    <Card>
-      <Card.Header>
-        <Card.Title className="mb-0">Recent Activities</Card.Title>
-      </Card.Header>
-      <Card.Body>
-        <div className="activity-list">
-          {bookings
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort latest first
-            .slice(0, 5) // Take only the latest 5 bookings
-            .map((booking, index) => (
-              <div key={index} className="activity-item">
-                <div className="activity-icon">📌</div>
-                <div className="activity-details">
-                  <p className="activity-title mb-1">New booking #{index + 1}</p>
-                  <p className="activity-desc mb-1">
-                    {(booking.user?.username || `User ID: ${booking.user?._id}`) || "Unknown User"} booked{" "}
-                    {booking.event?.title || "an event"}
-                  </p>
-                  <p className="activity-time text-muted">
-                    {new Date(booking.createdAt).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            ))}
-        </div>
-      </Card.Body>
-    </Card>
-  </Col>
-</Row>
-
-
-
-
+                  {/* Recent Activities */}
+                  <Row>
+                    <Col>
+                      <Card>
+                        <Card.Header>
+                          <Card.Title className="mb-0">Recent Activities</Card.Title>
+                        </Card.Header>
+                        <Card.Body>
+                          <div className="activity-list">
+                            {bookings
+                              .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                              .slice(0, 5)
+                              .map((booking, index) => (
+                                <div key={index} className="activity-item">
+                                  <div className="activity-icon">📌</div>
+                                  <div className="activity-details">
+                                    <p className="activity-title mb-1">New booking #{index + 1}</p>
+                                    <p className="activity-desc mb-1">
+                                      {(booking.user?.username || `User ID: ${booking.user?._id}`) || "Unknown User"} booked{" "}
+                                      {booking.event?.title || "an event"}
+                                    </p>
+                                    <p className="activity-time text-muted">
+                                      {new Date(booking.createdAt).toLocaleString()}
+                                    </p>
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  </Row>
                 </>
               )}
 
               {/* Users Section */}
               {activeSection === "users" && (
-  <Card>
-    <Card.Header className="d-flex justify-content-between align-items-center">
-      <Card.Title className="mb-0">User Management</Card.Title>
-      
-      {/* Sorting Dropdown */}
-      <Form.Select
-        className="w-auto"
-        value={roleFilter}
-        onChange={(e) => setRoleFilter(e.target.value)}
-      >
-        <option value="all">All Users</option>
-        <option value="organizer">Organizers</option>
-        <option value="attendee">Attendees</option>
-      </Form.Select>
-    </Card.Header>
+                <Card>
+                  <Card.Header className="d-flex justify-content-between align-items-center">
+                    <Card.Title className="mb-0">User Management</Card.Title>
+                    <Form.Select
+                      className="w-auto"
+                      value={roleFilter}
+                      onChange={(e) => setRoleFilter(e.target.value)}
+                    >
+                      <option value="all">All Users</option>
+                      <option value="organizer">Organizers</option>
+                      <option value="attendee">Attendees</option>
+                    </Form.Select>
+                  </Card.Header>
 
-    <Card.Body>
-      <div className="table-responsive">
-        <Table striped hover>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th> {/* New Styled Role Column */}
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.length > 0 ? (
-              filteredUsers
-                .filter((user) => roleFilter === "all" || user.role === roleFilter) // Sorting Logic
-                .map((user, index) => (
-                  <tr key={user.id || index}>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <div className="user-avatar">{user.name?.charAt(0) || "U"}</div>
-                        <div className="ms-2">{user.name || "John Doe"}</div>
+                  <Card.Body>
+                    <div className="table-responsive">
+                      <Table striped hover>
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredUsers.length > 0 ? (
+                            filteredUsers
+                              .filter((user) => roleFilter === "all" || user.role === roleFilter)
+                              .map((user, index) => (
+                                <tr key={user.id || index}>
+                                  <td>
+                                    <div className="d-flex align-items-center">
+                                      <div className="user-avatar">{user.name?.charAt(0) || "U"}</div>
+                                      <div className="ms-2">{user.name || "John Doe"}</div>
+                                    </div>
+                                  </td>
+                                  <td>{user.email || "user@example.com"}</td>
+                                  <td>
+                                    {user.role === "attendee" && (
+                                      <Badge bg="info" className="px-3 py-2">
+                                        🎟️ Attendee
+                                      </Badge>
+                                    )}
+                                    {user.role === "organizer" && (
+                                      <Badge bg="warning" className="px-3 py-2 text-dark">
+                                        🎤 Organizer
+                                      </Badge>
+                                    )}
+                                    {user.role === "admin" && (
+                                      <Badge bg="danger" className="px-3 py-2">
+                                        🛡️ Admin
+                                      </Badge>
+                                    )}
+                                    {!user.role && (
+                                      <Badge bg="secondary" className="px-3 py-2">
+                                        👤 User
+                                      </Badge>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <Badge bg="success" pill>Active</Badge>
+                                  </td>
+                                  <td>
+                                    <Button
+                                      variant="outline-primary"
+                                      size="sm"
+                                      className="me-2"
+                                      onClick={() => handleEditUserClick(user)}
+                                    >
+                                      <FaEdit /> Edit
+                                    </Button>
+                                    <Button
+                                      variant="outline-danger"
+                                      size="sm"
+                                      onClick={() => handleDeleteUserClick(user._id)}
+                                    >
+                                      <FaTrash /> Delete
+                                    </Button>
+                                  </td>
+                                </tr>
+                              ))
+                          ) : (
+                            <tr>
+                              <td colSpan="5" className="text-center py-3">
+                                {searchTerm ? "No users match your search" : "No users found"}
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </Table>
+                    </div>
+
+                    <div className="d-flex justify-content-between align-items-center mt-3">
+                      <div className="text-muted">
+                        Showing <span className="fw-bold">{filteredUsers.length}</span> users
                       </div>
-                    </td>
-                    <td>{user.email || "user@example.com"}</td>
-
-                    {/* Role Column with Styled Badges & Icons */}
-                    <td>
-                      {user.role === "attendee" && (
-                        <Badge bg="info" className="px-3 py-2">
-                          🎟️ Attendee
-                        </Badge>
-                      )}
-                      {user.role === "organizer" && (
-                        <Badge bg="warning" className="px-3 py-2 text-dark">
-                          🎤 Organizer
-                        </Badge>
-                      )}
-                      {user.role === "admin" && (
-                        <Badge bg="danger" className="px-3 py-2">
-                          🛡️ Admin
-                        </Badge>
-                      )}
-                      {!user.role && (
-                        <Badge bg="secondary" className="px-3 py-2">
-                          👤 User
-                        </Badge>
-                      )}
-                    </td>
-
-                    <td>
-                      <Badge bg="success" pill>Active</Badge>
-                    </td>
-
-                    <td>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        className="me-2"
-                        onClick={() => handleEditUserClick(user)}
-                      >
-                        <FaEdit /> Edit
-                      </Button>
-                      <Button
-                        variant="outline-danger"
-                        size="sm"
-                        onClick={() => handleDeleteUserClick(user._id)}
-                      >
-                        <FaTrash /> Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="text-center py-3">
-                  {searchTerm ? "No users match your search" : "No users found"}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </div>
-
-      <div className="d-flex justify-content-between align-items-center mt-3">
-        <div className="text-muted">
-          Showing <span className="fw-bold">{filteredUsers.length}</span> users
-        </div>
-        <div>
-          <Button variant="outline-secondary" size="sm" className="me-2" disabled>
-            Previous
-          </Button>
-          <Button variant="outline-secondary" size="sm" disabled>
-            Next
-          </Button>
-        </div>
-      </div>
-    </Card.Body>
-  </Card>
-)}
-
-
-
-
-{/* Add/Edit User Modal */}
-<Modal show={showUserModal} onHide={() => setShowUserModal(false)} centered>
-  <Modal.Header closeButton>
-    <Modal.Title>{editingUser ? "Edit User" : "Add User"}</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <Form>
-      <Form.Group>
-        <Form.Label>Name</Form.Label>
-        <Form.Control 
-          type="text" 
-          value={userForm.name} 
-          onChange={(e) => setUserForm({ ...userForm, name: e.target.value })} 
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label>Email</Form.Label>
-        <Form.Control 
-          type="email" 
-          value={userForm.email} 
-          onChange={(e) => setUserForm({ ...userForm, email: e.target.value })} 
-        />
-      </Form.Group>
-      {/* <Form.Group>
-        <Form.Label>Password</Form.Label>
-        <Form.Control 
-          type="password" 
-          value={userForm.password} 
-          onChange={(e) => setUserForm({ ...userForm, password: e.target.value })} 
-        />
-      </Form.Group> */}
-    </Form>
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="secondary" onClick={() => setShowUserModal(false)}>Cancel</Button>
-    <Button variant="primary" onClick={handleSaveUser}>
-      {editingUser ? "Update User" : "Create User"}
-    </Button>
-  </Modal.Footer>
-</Modal>
-
-
-            {/* Events Section */}
-{activeSection === "events" && (
-  <Card>
-    <Card.Header>
-      <Card.Title className="mb-0">Event Management</Card.Title>
-    </Card.Header>
-    <Card.Body>
-      <Row>
-        {events.slice(0, 6).map((event, index) => (
-          <Col lg={4} md={6} key={event._id || index} className="mb-4">
-            <Card className="h-100">
-              {/* Display Event Image */}
-              {event.image ? (
-                <Card.Img variant="top" src={event.image} alt={event.title} className="event-image" />
-              ) : (
-                <div className="event-image-placeholder d-flex align-items-center justify-content-center">
-                  <FaCalendarAlt size={50} className="text-secondary" />
-                </div>
+                      <div>
+                        <Button variant="outline-secondary" size="sm" className="me-2" disabled>
+                          Previous
+                        </Button>
+                        <Button variant="outline-secondary" size="sm" disabled>
+                          Next
+                        </Button>
+                      </div>
+                    </div>
+                  </Card.Body>
+                </Card>
               )}
 
-              <Card.Body>
-                <Card.Title>{event.title || `Event ${index + 1}`}</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">
-                  {new Date(event.date).toDateString()}
-                </Card.Subtitle>
-                <Card.Text>
-                  {event.description?.substring(0, 80) || "Event description goes here..."}
-                </Card.Text>
-              </Card.Body>
+              {/* Add/Edit User Modal */}
+              <Modal show={showUserModal} onHide={() => setShowUserModal(false)} centered>
+                <Modal.Header closeButton>
+                  <Modal.Title>{editingUser ? "Edit User" : "Add User"}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <Form>
+                    <Form.Group>
+                      <Form.Label>Name</Form.Label>
+                      <Form.Control 
+                        type="text" 
+                        value={userForm.name} 
+                        onChange={(e) => setUserForm({ ...userForm, name: e.target.value })} 
+                      />
+                    </Form.Group>
+                    <Form.Group>
+                      <Form.Label>Email</Form.Label>
+                      <Form.Control 
+                        type="email" 
+                        value={userForm.email} 
+                        onChange={(e) => setUserForm({ ...userForm, email: e.target.value })} 
+                      />
+                    </Form.Group>
+                  </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={() => setShowUserModal(false)}>Cancel</Button>
+                  <Button variant="primary" onClick={handleSaveUser}>
+                    {editingUser ? "Update User" : "Create User"}
+                  </Button>
+                </Modal.Footer>
+              </Modal>
 
-              <Card.Footer className="bg-transparent">
-                <Button variant="outline-primary" size="sm" className="me-2">
-                  <FaEdit /> Edit
-                </Button>
-                <Button variant="outline-danger" size="sm">
-                  <FaTrash /> Delete
-                </Button>
-              </Card.Footer>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-    </Card.Body>
-  </Card>
-)}
+              {/* Events Section */}
+              {activeSection === "events" && (
+                <Card>
+                  <Card.Header className="d-flex justify-content-between align-items-center">
+                    <Card.Title className="mb-0">Event Management</Card.Title>
+                    <Button variant="primary" onClick={handleAddEventClick}>
+                      Add Event
+                    </Button>
+                  </Card.Header>
+                  <Card.Body>
+                    <Row>
+                      {events.slice(0, 6).map((event, index) => (
+                        <Col lg={4} md={6} key={event._id || index} className="mb-4">
+                          <Card className="h-100">
+                            {event.image ? (
+                              <Card.Img variant="top" src={event.image} alt={event.title} className="event-image" />
+                            ) : (
+                              <div className="event-image-placeholder d-flex align-items-center justify-content-center">
+                                <FaCalendarAlt size={50} className="text-secondary" />
+                              </div>
+                            )}
+                            <Card.Body>
+                              <Card.Title>{event.title || `Event ${index + 1}`}</Card.Title>
+                              <Card.Subtitle className="mb-2 text-muted">
+                                {new Date(event.date).toDateString()}
+                              </Card.Subtitle>
+                              <Card.Text>
+                                {event.description?.substring(0, 80) || "Event description goes here..."}
+                              </Card.Text>
+                            </Card.Body>
+                            <Card.Footer className="bg-transparent">
+                              <Button 
+                                variant="outline-primary" 
+                                size="sm" 
+                                className="me-2"
+                                onClick={() => handleEditEventClick(event)}
+                              >
+                                <FaEdit /> Edit
+                              </Button>
+                              <Button 
+                                variant="outline-danger" 
+                                size="sm"
+                                onClick={() => handleDeleteEventClick(event._id)}
+                              >
+                                <FaTrash /> Delete
+                              </Button>
+                            </Card.Footer>
+                          </Card>
+                        </Col>
+                      ))}
+                    </Row>
+                  </Card.Body>
+                </Card>
+              )}
+
+              {/* Add/Edit Event Modal */}
+              <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+                <Modal.Header closeButton>
+                  <Modal.Title>{editingEventId ? "Edit Event" : "Add Event"}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <Form>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Title</Form.Label>
+                      <Form.Control 
+                        type="text" 
+                        value={eventData.title} 
+                        onChange={(e) => setEventData({ ...eventData, title: e.target.value })} 
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Description</Form.Label>
+                      <Form.Control 
+                        as="textarea" 
+                        rows={3}
+                        value={eventData.description} 
+                        onChange={(e) => setEventData({ ...eventData, description: e.target.value })} 
+                      />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Date</Form.Label>
+                      <Form.Control 
+                        type="date" 
+                        value={eventData.date} 
+                        onChange={(e) => setEventData({ ...eventData, date: e.target.value })} 
+                      />
+                    </Form.Group>
+                  </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
+                  <Button variant="primary" onClick={handleSaveEvent}>
+                    {editingEventId ? "Update Event" : "Create Event"}
+                  </Button>
+                </Modal.Footer>
+              </Modal>
+
+              {/* Event Delete Confirmation Modal */}
+              <Modal show={showEventDeleteModal} onHide={() => setShowEventDeleteModal(false)} centered>
+                <Modal.Header closeButton>
+                  <Modal.Title>Confirm Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  Are you sure you want to delete this event? This action cannot be undone.
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button variant="secondary" onClick={() => setShowEventDeleteModal(false)}>
+                    Cancel
+                  </Button>
+                  <Button variant="danger" onClick={confirmDeleteEvent}>
+                    Delete Event
+                  </Button>
+                </Modal.Footer>
+              </Modal>
 
               {/* Bookings Section */}
               {activeSection === "bookings" && (
-              <Card>
-              <Card.Header>
-                <Card.Title className="mb-0">Booking Management</Card.Title>
-              </Card.Header>
-              <Card.Body>
-                  <div className="table-responsive">
-                  <Table striped hover>
-                  <thead>
-                  <tr>
-                  <th>ID</th>
-                  <th>User</th>
-                  <th>Event</th>
-                  <th>Organizer</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  {bookings.slice(0, 8).map((booking, index) => {
-                  const eventDate = new Date(booking.event?.date);
-                  const currentDate = new Date();
-                  const isCompleted = eventDate < currentDate;
+                <Card>
+                  <Card.Header>
+                    <Card.Title className="mb-0">Booking Management</Card.Title>
+                  </Card.Header>
+                  <Card.Body>
+                    <div className="table-responsive">
+                      <Table striped hover>
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Event</th>
+                            <th>Organizer</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {bookings.slice(0, 8).map((booking, index) => {
+                            const eventDate = new Date(booking.event?.date);
+                            const currentDate = new Date();
+                            const isCompleted = eventDate < currentDate;
 
-                 return (
-                  <tr key={booking._id || index}>
-                  <td>#{booking._id || index + 1}</td>
-                  <td>{booking.user?.name || "Unknown User"}</td>
-                  <td>{booking.event?.title || "Unknown Event"}</td>
-                  <td>{booking.event?.organizer?.name || "Unknown Organizer"}</td>
-                  <td>{eventDate.toLocaleDateString() || "N/A"}</td>
-                  <td>
-                    <Badge bg={isCompleted ? 'primary' : 'success'} pill>
-                      {isCompleted ? 'Completed' : 'Confirmed'}
-                    </Badge>
-                  </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-            </Table>
-          </div>
-          </Card.Body>
-        </Card>
-          )}
+                            return (
+                              <tr key={booking._id || index}>
+                                <td>#{booking._id || index + 1}</td>
+                                <td>{booking.user?.name || "Unknown User"}</td>
+                                <td>{booking.event?.title || "Unknown Event"}</td>
+                                <td>{booking.event?.organizer?.name || "Unknown Organizer"}</td>
+                                <td>{eventDate.toLocaleDateString() || "N/A"}</td>
+                                <td>
+                                  <Badge bg={isCompleted ? 'primary' : 'success'} pill>
+                                    {isCompleted ? 'Completed' : 'Confirmed'}
+                                  </Badge>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </Table>
+                    </div>
+                  </Card.Body>
+                </Card>
+              )}
             </>
           )}
         </Container>
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* User Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
