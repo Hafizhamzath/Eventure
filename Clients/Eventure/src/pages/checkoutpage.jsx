@@ -18,19 +18,36 @@ const EventCheckout = () => {
   useEffect(() => {
     const fetchEventDetails = async () => {
       try {
-        const response = await axios.get(`https://eventure-backend-i38o.onrender.com/api/events/${eventId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        setLoading(true);
+        setError(null);
+  
+        // Use your centralized API instance instead of direct axios
+        const response = await API.get(`/events/${eventId}`);
         setEventDetails(response.data);
+  
       } catch (err) {
-        setError(err.response?.data?.message || err.message);
+        // Enhanced error handling
+        if (err.response) {
+          if (err.response.status === 401) {
+            // Token expired - the interceptor should have handled refresh
+            setError("Session expired. Please login again.");
+            // Redirect to login after delay
+            setTimeout(() => window.location.href = "/login", 2000);
+          } else if (err.response.status === 404) {
+            setError("Event not found");
+          } else {
+            setError(err.response.data?.message || "Failed to fetch event");
+          }
+        } else if (err.request) {
+          setError("Network error - please check your connection");
+        } else {
+          setError(err.message);
+        }
       } finally {
         setLoading(false);
       }
     };
-    
+  
     fetchEventDetails();
   }, [eventId]);
 
