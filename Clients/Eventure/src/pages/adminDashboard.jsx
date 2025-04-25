@@ -554,9 +554,6 @@ const AdminDashboard = () => {
                 <Card>
                   <Card.Header className="d-flex justify-content-between align-items-center">
                     <Card.Title className="mb-0">Event Management</Card.Title>
-                    <Button variant="primary" onClick={handleAddEventClick}>
-                      Add Event
-                    </Button>
                   </Card.Header>
                   <Card.Body>
                     <Row>
