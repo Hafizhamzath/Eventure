@@ -50,7 +50,7 @@ const refreshAuthToken = async () => {
     if (response.data?.token) {
       storeAuthData({
         token: response.data.token,
-        refreshToken: response.data.refreshToken || refreshToken // Use new refreshToken if provided
+        refreshToken: response.data.refreshToken || refreshToken
       });
       return response.data.token;
     }
@@ -66,22 +66,23 @@ const refreshAuthToken = async () => {
 // 🔄 Axios Interceptors
 // ========================
 API.interceptors.request.use(async (config) => {
-  const token = localStorage.getItem("token");
+  config.headers = {
+    ...config.headers,
+    "Content-Type": "application/json",
+  };
 
+  const token = localStorage.getItem("token");
   if (token) {
     if (isTokenExpired(token)) {
       console.log("🔄 Token expired, attempting refresh...");
       const newToken = await refreshAuthToken();
       if (newToken) {
         config.headers.Authorization = `Bearer ${newToken}`;
-      } else {
-        console.warn("⚠️ Proceeding without valid token");
       }
     } else {
       config.headers.Authorization = `Bearer ${token}`;
     }
   }
-
   return config;
 });
 
@@ -89,8 +90,6 @@ API.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
-    // Auto-retry with new token on 401 errors
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       const newToken = await refreshAuthToken();
@@ -99,13 +98,6 @@ API.interceptors.response.use(
         return API(originalRequest);
       }
     }
-
-    // Special handling for token-related errors
-    if (error.response?.data?.message?.includes("token")) {
-      clearAuthData();
-      window.location.href = "/login?session_expired=true";
-    }
-
     return Promise.reject(error);
   }
 );
@@ -262,6 +254,15 @@ export const fetchAllPayments = async () => {
     return data;
   } catch (error) {
     return handleApiError(error, "Failed to fetch payments");
+  }
+};
+
+export const processPayment = async (paymentData) => {
+  try {
+    const { data } = await API.post("/payments/pay", paymentData);
+    return data;
+  } catch (error) {
+    return handleApiError(error, "Payment failed");
   }
 };
 
