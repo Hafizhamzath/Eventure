@@ -3,7 +3,7 @@ import axios from "axios";
 import "../styles/OrganizerDashboard.css";
 
 const API = axios.create({
-  baseURL: "http://https://eventure-backend-1ewk.onrender.com/api",
+  baseURL: "https://eventure-backend-1ewk.onrender.com/api",
 });
 
 API.interceptors.request.use((config) => {

@@ -61,7 +61,7 @@ function PaymentForm({ event, totals,formData,ticketCount, bookingId, navigate }
   
       // Get client secret from backend
       const response = await axios.post(
-        "http://https://eventure-backend-1ewk.onrender.com/api/payments/pay",
+        "https://eventure-backend-1ewk.onrender.com/api/payments/pay",
         { amount: totals.total, bookingId },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
